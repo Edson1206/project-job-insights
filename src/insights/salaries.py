@@ -71,18 +71,17 @@ def matches_salary_range(job: Dict, salary: Union[int, str]) -> bool:
         If `job["min_salary"]` is greather than `job["max_salary"]`
         If `salary` isn't a valid integer
     """
-    value = int(salary) if isinstance(salary, str) else salary
+    try:
+        min_salary = int(job["min_salary"])
+        max_salary = int(job["max_salary"])
 
-    if ("min_salary" not in job or "max_salary" not in job):
-        raise ValueError("'min_salary' or 'max_salary' doesn't exist.")
-
-    elif (type(job["min_salary"]) != int or type(job["max_salary"]) != int):
-        raise ValueError("'min_salary' or 'max_salary' aren't valid integers.")
-
-    elif (job["min_salary"] > job["max_salary"]):
-        raise ValueError("'min_salary' is greater than 'max_salary'.")
-
-    return True if job["min_salary"] <= value <= job["max_salary"] else False
+        if callable(salary) or None in job.values() or min_salary > max_salary:
+            raise ValueError
+        return int(salary) in range(min_salary, max_salary)
+    except TypeError:
+        raise ValueError
+    except KeyError:
+        raise ValueError
 
 
 def filter_by_salary_range(
@@ -103,4 +102,14 @@ def filter_by_salary_range(
     list
         Jobs whose salary range contains `salary`
     """
-    raise NotImplementedError
+    jobs_filtered = []
+
+    for jobs_list in jobs:
+        try:
+            verify_bool = matches_salary_range(jobs_list, salary)
+        except ValueError:
+            verify_bool = False
+        if verify_bool:
+            jobs_filtered.append(jobs_list)
+
+    return jobs_filtered
