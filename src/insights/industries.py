@@ -1,3 +1,4 @@
+from src.insights.jobs import read
 from typing import List, Dict
 
 
@@ -16,7 +17,14 @@ def get_unique_industries(path: str) -> List[str]:
     list
         List of unique industries
     """
-    raise NotImplementedError
+    jobs_list = read(path)
+    industries = list()
+
+    for job in jobs_list:
+        industry = job["industry"].strip()
+        if industry not in industries and industry != "":
+            industries.append(industry)
+    return industries
 
 
 def filter_by_industry(jobs: List[Dict], industry: str) -> List[Dict]:
